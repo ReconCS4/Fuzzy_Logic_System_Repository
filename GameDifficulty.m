@@ -10,21 +10,21 @@ home;
 % A declaration of a new FIS (a)
 a = newfis('ResourceManagement');
 % Declaring a new variable - (a) INT(1)
-a = addvar(a, 'input', 'AmmoAndThrowablas', [0 40]);
+a = addvar(a, 'input', 'AmmoAndThrowables', [0 40]);
 % Populating (a) INT(1) with mambarship functions
-a = addmf(a, 'input', 1, 'Low', 'trimf', [0 5 15]);
-a = addmf(a, 'input', 1, 'Madium', 'trimf', [10 20 25]);
-a = addmf(a, 'input', 1, 'High', 'trapmf', [15 25 30 40]);
+a = addmf(a, 'input', 1, 'Low', 'trapmf', [0 0 5 15]);
+a = addmf(a, 'input', 1, 'Medium', 'trimf', [10 20 25]);
+a = addmf(a, 'input', 1, 'High', 'trapmf', [20 30 40 40]);
 % Declaring a new variable - (a) INT(2)
 a = addvar(a, 'input', 'Explosives', [0 20]);
 % Populating (a) INT(2) with membership functions
-a = addmf(a, 'input', 2, 'Low', 'trimf', [0 3 10]);
+a = addmf(a, 'input', 2, 'Low', 'trapmf', [0 0 5 10]);
 a = addmf(a, 'input', 2, 'Medium', 'trimf', [5 10 15]);
 a = addmf(a, 'input', 2, 'High', 'trapmf', [7 15 20 20]);
 % Declaring a new variable - (a) INT(3)
 a = addvar(a, 'input', 'MedKits', [0 10]);
 % Populating (a) INT(3) with membership functions
-a = addmf(a, 'input', 3, 'Low', 'trimf', [0 3 5]);
+a = addmf(a, 'input', 3, 'Low', 'trapmf', [0 0 3 5]);
 a = addmf(a, 'input', 3, 'Medium', 'trimf', [2 5 7]);
 a = addmf(a, 'input', 3, 'High', 'trapmf', [5 7 10 10]);
 
@@ -157,86 +157,100 @@ e = addmf(e, 'output', 1, 'Grounded', 'gaussmf', [15 100]);
 
 
 
-
 % A rule matrix to store all applicable rules
-ruleList = [];
-% Health
-ruleList = [ruleList; "Restarts    == High                          => Health = Bad          (0.4)"];
-ruleList = [ruleList; "DamageTaken == High    & Restarts == Medium  => Health = Bad          (0.4)"];
-ruleList = [ruleList; "DamageTaken == Low     & Restarts == High    => Health = Average      (0.4)"];
-ruleList = [ruleList; "DamageTaken == Medium  & Restarts == Medium  => Health = Average      (0.4)"];
-ruleList = [ruleList; "DamageTaken == High    & Restarts == Low     => Health = Average      (0.4)"];
-ruleList = [ruleList; "DamageTaken == Low     & Restarts == Medium  => Health = Good         (0.4)"];
-ruleList = [ruleList; "DamageTaken == Medium  & Restarts == Low     => Health = Good         (0.4)"];
-ruleList = [ruleList; "Restarts    == Low                           => Health = Outstanding  (0.4)"];
 % Resource Management
-ruleList = [ruleList; "AmmoAndThrowables == High    & Explosives == High    & Medkits == High    => ResourceManagement = Bad          (0.35)"];
-ruleList = [ruleList; "AmmoAndThrowables == Medium  & Explosives == Medium  & Medkits == Medium  => ResourceManagement = Average      (0.35)"];
-ruleList = [ruleList; "AmmoAndThrowables == Low     & Explosives == Low     & Medkits == Low     => ResourceManagement = Outstanding  (0.35)"];
+rule1 = "AmmoAndThrowables == High    & Explosives == High    & MedKits == High    => ResourceManagement = Bad          (0.35)";
+rule2 = "AmmoAndThrowables == Medium  & Explosives == Medium  & MedKits == Medium  => ResourceManagement = Average      (0.35)";
+rule3 = "AmmoAndThrowables == Low     & Explosives == Low     & MedKits == Low     => ResourceManagement = Outstanding  (0.35)";
 % Enemy Dispatches
-ruleList = [ruleList; "EnemyTakedowns == Low     & StealthTakedowns == Low     & AllyTakedowns == Low     => EnemyDispatches = Low     (0.25)"];
-ruleList = [ruleList; "EnemyTakedowns == Medium  & StealthTakedowns == Medium  & AllyTakedowns == Medium  => EnemyDispatches = Medium  (0.25)"];
-ruleList = [ruleList; "EnemyTakedowns == High    & StealthTakedowns == High    & AllyTakedowns == High    => EnemyDispatches = High    (0.25)"];
+rule4 = "EnemyTakedowns == Low     & StealthTakedowns == Low     & AllyTakedowns == Low     => EnemyDispatches = Low     (0.25)";
+rule5 = "EnemyTakedowns == Medium  & StealthTakedowns == Medium  & AllyTakedowns == Medium  => EnemyDispatches = Medium  (0.25)";
+rule6 = "EnemyTakedowns == High    & StealthTakedowns == High    & AllyTakedowns == High    => EnemyDispatches = High    (0.25)";
+% Health
+rule7 = "Restarts    == High                          => Health = Bad          (0.4)";
+rule8 = "DamageTaken == High    & Restarts == Medium  => Health = Bad          (0.4)";
+rule9 = "DamageTaken == Low     & Restarts == High    => Health = Average      (0.4)";
+rule10 = "DamageTaken == Medium  & Restarts == Medium  => Health = Average      (0.4)";
+rule11 = "DamageTaken == High    & Restarts == Low     => Health = Average      (0.4)";
+rule12 = "DamageTaken == Low     & Restarts == Medium  => Health = Good         (0.4)";
+rule13 = "DamageTaken == Medium  & Restarts == Low     => Health = Good         (0.4)";
+rule14 = "Restarts    == Low                           => Health = Outstanding  (0.4)";
 % Player Skill
-ruleList = [ruleList; "Health == Bad         & ResourceManagement == Bad                                   => PlayerSkill = StoryMode   (0.7)"];
-ruleList = [ruleList; "Health == Bad         & ResourceManagement == Bad         & EnemyDispatches == High => PlayerSkill = Basic       (0.7)"];
-ruleList = [ruleList; "Health == Average     & ResourceManagement == Average                               => PlayerSkill = Moderate    (0.7)"];
-ruleList = [ruleList; "Health == Average     & ResourceManagement == Average     & EnemyDispatches == High => PlayerSkill = Hardcore    (0.7)"];
-ruleList = [ruleList; "Health == Good        & ResourceManagement == Good                                  => PlayerSkill = Survivor    (0.7)"];
-ruleList = [ruleList; "Health == Outstanding & ResourceManagement == Outstanding                           => PlayerSkill = Unstoppable (0.7)"];
-% Difficulty Level (PS: Story Mode)
-ruleList = [ruleList; "PlayerSkill == StoryMode & CurrentDifficulty == VeryLight => DifficultyLevel = VeryLight (1)"];
-ruleList = [ruleList; "PlayerSkill == StoryMode & CurrentDifficulty == Light     => DifficultyLevel = VeryLight (1)"];
-ruleList = [ruleList; "PlayerSkill == StoryMode & CurrentDifficulty == Moderate  => DifficultyLevel = Light     (1)"];
-ruleList = [ruleList; "PlayerSkill == StoryMode & CurrentDifficulty == Hard      => DifficultyLevel = Light     (1)"];
-ruleList = [ruleList; "PlayerSkill == StoryMode & CurrentDifficulty == Survivor  => DifficultyLevel = Moderate  (1)"];
-ruleList = [ruleList; "PlayerSkill == StoryMode & CurrentDifficulty == Grounded  => DifficultyLevel = Moderate  (1)"];
-% Difficulty Level (PS: Basic)
-ruleList = [ruleList; "PlayerSkill == Basic & CurrentDifficulty == VeryLight => DifficultyLevel = Light    (1)"];
-ruleList = [ruleList; "PlayerSkill == Basic & CurrentDifficulty == Light     => DifficultyLevel = Light    (1)"];
-ruleList = [ruleList; "PlayerSkill == Basic & CurrentDifficulty == Moderate  => DifficultyLevel = Light    (1)"];
-ruleList = [ruleList; "PlayerSkill == Basic & CurrentDifficulty == Hard      => DifficultyLevel = Moderate (1)"];
-ruleList = [ruleList; "PlayerSkill == Basic & CurrentDifficulty == Survivor  => DifficultyLevel = Moderate (1)"];
-ruleList = [ruleList; "PlayerSkill == Basic & CurrentDifficulty == Grounded  => DifficultyLevel = Hard     (1)"];
-% Difficulty Level (PS: Moderate)
-ruleList = [ruleList; "PlayerSkill == Moderate & CurrentDifficulty == VeryLight => DifficultyLevel = Light    (1)"];
-ruleList = [ruleList; "PlayerSkill == Moderate & CurrentDifficulty == Light     => DifficultyLevel = Moderate (1)"];
-ruleList = [ruleList; "PlayerSkill == Moderate & CurrentDifficulty == Moderate  => DifficultyLevel = Moderate (1)"];
-ruleList = [ruleList; "PlayerSkill == Moderate & CurrentDifficulty == Hard      => DifficultyLevel = Hard     (1)"];
-ruleList = [ruleList; "PlayerSkill == Moderate & CurrentDifficulty == Survivor  => DifficultyLevel = Hard     (1)"];
-ruleList = [ruleList; "PlayerSkill == Moderate & CurrentDifficulty == Grounded  => DifficultyLevel = Survivor (1)"];
-% Difficulty Level (PS: Hardcore)
-ruleList = [ruleList; "PlayerSkill == Hardcore & CurrentDifficulty == VeryLight => DifficultyLevel = Moderate (1)"];
-ruleList = [ruleList; "PlayerSkill == Hardcore & CurrentDifficulty == Light     => DifficultyLevel = Moderate (1)"];
-ruleList = [ruleList; "PlayerSkill == Hardcore & CurrentDifficulty == Moderate  => DifficultyLevel = Hard     (1)"];
-ruleList = [ruleList; "PlayerSkill == Hardcore & CurrentDifficulty == Hard      => DifficultyLevel = Hard     (1)"];
-ruleList = [ruleList; "PlayerSkill == Hardcore & CurrentDifficulty == Survivor  => DifficultyLevel = Survivor (1)"];
-ruleList = [ruleList; "PlayerSkill == Hardcore & CurrentDifficulty == Grounded  => DifficultyLevel = Survivor (1)"];
-% Difficulty Level (PS: Survivor)
-ruleList = [ruleList; "PlayerSkill == Survivor & CurrentDifficulty == VeryLight => DifficultyLevel = Moderate (1)"];
-ruleList = [ruleList; "PlayerSkill == Survivor & CurrentDifficulty == Light     => DifficultyLevel = Hard     (1)"];
-ruleList = [ruleList; "PlayerSkill == Survivor & CurrentDifficulty == Moderate  => DifficultyLevel = Hard     (1)"];
-ruleList = [ruleList; "PlayerSkill == Survivor & CurrentDifficulty == Hard      => DifficultyLevel = Survivor (1)"];
-ruleList = [ruleList; "PlayerSkill == Survivor & CurrentDifficulty == Survivor  => DifficultyLevel = Survivor (1)"];
-ruleList = [ruleList; "PlayerSkill == Survivor & CurrentDifficulty == Grounded  => DifficultyLevel = Grounded (1)"];
-% Difficulty Level (PS: Unstoppable)
-ruleList = [ruleList; "PlayerSkill == Unstoppable & CurrentDifficulty == VeryLight => DifficultyLevel = Hard     (1)"];
-ruleList = [ruleList; "PlayerSkill == Unstoppable & CurrentDifficulty == Light     => DifficultyLevel = Hard     (1)"];
-ruleList = [ruleList; "PlayerSkill == Unstoppable & CurrentDifficulty == Moderate  => DifficultyLevel = Survivor (1)"];
-ruleList = [ruleList; "PlayerSkill == Unstoppable & CurrentDifficulty == Hard      => DifficultyLevel = Survivor (1)"];
-ruleList = [ruleList; "PlayerSkill == Unstoppable & CurrentDifficulty == Survivor  => DifficultyLevel = Grounded (1)"];
-ruleList = [ruleList; "PlayerSkill == Unstoppable & CurrentDifficulty == Grounded  => DifficultyLevel = Grounded (1)"];
+rule15 = "Health == Bad         & ResourceManagement == Bad                                   => PlayerSkill = StoryMode   (0.7)";
+rule16 = "Health == Bad         & ResourceManagement == Bad         & EnemyDispatches == High => PlayerSkill = Basic       (0.7)";
+rule17 = "Health == Average     & ResourceManagement == Average                               => PlayerSkill = Moderate    (0.7)";
+rule18 = "Health == Average     & ResourceManagement == Average     & EnemyDispatches == High => PlayerSkill = Hardcore    (0.7)";
+rule19 = "Health == Good        & ResourceManagement == Good                                  => PlayerSkill = Survivor    (0.7)";
+rule20 = "Health == Outstanding & ResourceManagement == Outstanding                           => PlayerSkill = Unstoppable (0.7)";
+% Difficuly Level (PS: Story Mode)
+rule21 = "PlayerSkill == StoryMode & CurrentDifficulty == VeryLight => DifficultyLevel = VeryLight (1)";
+rule22 = "PlayerSkill == StoryMode & CurrentDifficulty == Light     => DifficultyLevel = VeryLight (1)";
+rule23 = "PlayerSkill == StoryMode & CurrentDifficulty == Moderate  => DifficultyLevel = Light     (1)";
+rule24 = "PlayerSkill == StoryMode & CurrentDifficulty == Hard      => DifficultyLevel = Light     (1)";
+rule25 = "PlayerSkill == StoryMode & CurrentDifficulty == Survivor  => DifficultyLevel = Moderate  (1)";
+rule26 = "PlayerSkill == StoryMode & CurrentDifficulty == Grounded  => DifficultyLevel = Moderate  (1)";
+% Difficuly Level (PS: Basic)
+rule27 = "PlayerSkill == Basic & CurrentDifficulty == VeryLight => DifficultyLevel = Light    (1)";
+rule28 = "PlayerSkill == Basic & CurrentDifficulty == Light     => DifficultyLevel = Light    (1)";
+rule29 = "PlayerSkill == Basic & CurrentDifficulty == Moderate  => DifficultyLevel = Light    (1)";
+rule30 = "PlayerSkill == Basic & CurrentDifficulty == Hard      => DifficultyLevel = Moderate (1)";
+rule31 = "PlayerSkill == Basic & CurrentDifficulty == Survivor  => DifficultyLevel = Moderate (1)";
+rule32 = "PlayerSkill == Basic & CurrentDifficulty == Grounded  => DifficultyLevel = Hard     (1)";
+% Difficuly Level (PS: Moderate)
+rule33 = "PlayerSkill == Moderate & CurrentDifficulty == VeryLight => DifficultyLevel = Light    (1)";
+rule34 = "PlayerSkill == Moderate & CurrentDifficulty == Light     => DifficultyLevel = Moderate (1)";
+rule35 = "PlayerSkill == Moderate & CurrentDifficulty == Moderate  => DifficultyLevel = Moderate (1)";
+rule36 = "PlayerSkill == Moderate & CurrentDifficulty == Hard      => DifficultyLevel = Hard     (1)";
+rule37 = "PlayerSkill == Moderate & CurrentDifficulty == Survivor  => DifficultyLevel = Hard     (1)";
+rule38 = "PlayerSkill == Moderate & CurrentDifficulty == Grounded  => DifficultyLevel = Survivor (1)";
+% Difficuly Level (PS: Hardcore)
+rule39 = "PlayerSkill == Hardcore & CurrentDifficulty == VeryLight => DifficultyLevel = Moderate (1)";
+rule40 = "PlayerSkill == Hardcore & CurrentDifficulty == Light     => DifficultyLevel = Moderate (1)";
+rule41 = "PlayerSkill == Hardcore & CurrentDifficulty == Moderate  => DifficultyLevel = Hard     (1)";
+rule42 = "PlayerSkill == Hardcore & CurrentDifficulty == Hard      => DifficultyLevel = Hard     (1)";
+rule43 = "PlayerSkill == Hardcore & CurrentDifficulty == Survivor  => DifficultyLevel = Survivor (1)";
+rule44 = "PlayerSkill == Hardcore & CurrentDifficulty == Grounded  => DifficultyLevel = Survivor (1)";
+% Difficuly Level (PS: Survivor)
+rule45 = "PlayerSkill == Survivor & CurrentDifficulty == VeryLight => DifficultyLevel = Moderate (1)";
+rule46 = "PlayerSkill == Survivor & CurrentDifficulty == Light     => DifficultyLevel = Hard     (1)";
+rule47 = "PlayerSkill == Survivor & CurrentDifficulty == Moderate  => DifficultyLevel = Hard     (1)";
+rule48 = "PlayerSkill == Survivor & CurrentDifficulty == Hard      => DifficultyLevel = Survivor (1)";
+rule49 = "PlayerSkill == Survivor & CurrentDifficulty == Survivor  => DifficultyLevel = Survivor (1)";
+rule50 = "PlayerSkill == Survivor & CurrentDifficulty == Grounded  => DifficultyLevel = Grounded (1)";
+% Difficuly Level (PS: Unstoppable)
+rule51 = "PlayerSkill == Unstoppable & CurrentDifficulty == VeryLight => DifficultyLevel = Hard     (1)";
+rule52 = "PlayerSkill == Unstoppable & CurrentDifficulty == Light     => DifficultyLevel = Hard     (1)";
+rule53 = "PlayerSkill == Unstoppable & CurrentDifficulty == Moderate  => DifficultyLevel = Survivor (1)";
+rule54 = "PlayerSkill == Unstoppable & CurrentDifficulty == Hard      => DifficultyLevel = Survivor (1)";
+rule55 = "PlayerSkill == Unstoppable & CurrentDifficulty == Survivor  => DifficultyLevel = Grounded (1)";
+rule56 = "PlayerSkill == Unstoppable & CurrentDifficulty == Grounded  => DifficultyLevel = Grounded (1)";
 
-
+ruleList1 = [rule1;rule2;rule3];
+ruleList2 = [rule4;rule5;rule6];
+ruleList3 = [rule7,rule8,rule9,rule10,rule11,rule12,rule13,rule14];
+ruleList4 = [rule15,rule16,rule17,rule18,rule19,rule20];
+ruleList5 = [rule21,rule22,rule23,rule24,rule25,rule26,rule27,rule28,rule29,rule30,rule31,rule32,rule33,rule34,rule35,rule36,rule37,rule38,rule39,rule40,rule41,rule42,rule43,rule44,rule45,rule46,rule47,rule48,rule49,rule50,rule51,rule52,rule53,rule54,rule55,rule56];
 
 % Add the rules to the FIS
-%a = addRule(a, ruleList);
+a = addRule(a, ruleList1);
+b = addRule(b, ruleList2);
+c = addRule(c, ruleList3);
+d = addRule(d, ruleList4);
+e = addRule(e, ruleList5);
 
 % Print the rules to the command window
-%showrule(a);
+showrule(a);
+showrule(b);
+showrule(c);
+showrule(d);
+showrule(e);
 
 % The ruleview allows you to see the rule-base
-%ruleview(a);
+ruleview(a);
+ruleview(b);
+ruleview(c);
+ruleview(d);
+ruleview(e);
 
 % The subplots to visualise the system
 figure(1);
